@@ -1,0 +1,36 @@
+spring:
+    application:
+      name: spring-batch-virtual-thread
+
+    datasource:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      username: root
+      password: admin
+      url: jdbc:mysql://localhost:3306/vehicle_db?createDatabaseIfNotExist=true
+
+    jpa:
+      show-sql: true
+      generate-ddl: true
+      hibernate:
+        ddl-auto: update # Options: none, update, create, create-drop
+      properties:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+    batch:
+      job:
+        enabled: true #Disable job run at startup
+      #    The initialize-schema property controls when Spring Batch should initialize or reinitialize the schema used for batch processing metadata tables.
+      #    These tables store information about job executions, step executions, and other related metadata.
+      #    ALWAYS: Spring Batch will always initialize (or reinitialize) the schema.
+      #    NEVER: Spring Batch will never initialize or modify the schema.
+      #    IF_ABSENT: Spring Batch will only initialize the schema if it does not already exist.
+      jdbc:
+        initialize-schema: always # related to initialize schema
+
+#This is the dynamic list. You can add another key, value.
+input:
+  files:
+    vehicles: data/tesla_invoices.csv
+    vehicles1: /data/tesla_invoices1.csv
+    vehicles2: /data/tesla_invoices2.csv
+    vehicles3: /data/tesla_invoices3.csv
