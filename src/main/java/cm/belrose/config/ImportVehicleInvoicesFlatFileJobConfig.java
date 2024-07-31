@@ -1,6 +1,8 @@
+/*
+
 package cm.belrose.config;
 
-import cm.belrose.config.properties.InputFilesProperties;
+import cm.belrose.config.properties.InputProperties;
 import cm.belrose.dto.VehicleDto;
 import cm.belrose.listener.CustomJobExecutionListener;
 import cm.belrose.reader.MultiResourceReaderThreadSafe;
@@ -24,15 +26,19 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Configuration
 @Slf4j
 @RequiredArgsConstructor
-public class ImportVehicleInvoicesJobConfig {
+public class ImportVehicleInvoicesFlatFileJobConfig {
 
-    private final InputFilesProperties inputFilesProperties;
+    private final InputProperties inputFilesProperties;
     private final CustomJobExecutionListener customJobExecutionListener;
 
-    /**
+
+    */
+/**
      * ResourceAwareItemReaderItemStream is an interface, and we can use it instead FlatFileItemReader directly
      * It is a good practice
-     */
+     *//*
+
+
     public ResourceAwareItemReaderItemStream<VehicleDto> vehicleDtoFlatFileItemReader() {
         return new FlatFileItemReaderBuilder<VehicleDto>()
                 .name("Vehicle item reader")
@@ -40,16 +46,20 @@ public class ImportVehicleInvoicesJobConfig {
                 .linesToSkip(1) //skip the first line
                 .delimited()
                 .delimiter(",")
-                .names("referenceNumber","model","type","customerFullName")
+                .names("referenceNumber", "model", "type", "customerFullName")
                 .comments("#") // specify to sky the comment line within the csv file
                 .targetType(VehicleDto.class)
                 .build();
     }
 
-    /**
+
+    */
+/**
      * This method is used for reading multiple resource
-     */
-    public MultiResourceItemReader<VehicleDto> multiResourceItemReader(){
+     *//*
+
+
+    public MultiResourceItemReader<VehicleDto> multiResourceItemReader() {
         return new MultiResourceItemReaderBuilder<VehicleDto>()
                 .name("Vehicle resources reader")
                 .resources(inputFilesProperties.getResources())
@@ -57,10 +67,14 @@ public class ImportVehicleInvoicesJobConfig {
                 .build();
     }
 
-    /**
-     *this method is for concurrency issue
-     */
-    public MultiResourceReaderThreadSafe<VehicleDto> multiResourceReaderThreadSafe(){
+
+    */
+/**
+     * this method is for concurrency issue
+     *//*
+
+
+    public MultiResourceReaderThreadSafe<VehicleDto> multiResourceReaderThreadSafe() {
         var multiResourceReader = new MultiResourceReaderThreadSafe<>(multiResourceItemReader());
         multiResourceReader.setResources(inputFilesProperties.getResources());
         return multiResourceReader;
@@ -73,24 +87,28 @@ public class ImportVehicleInvoicesJobConfig {
                 .<VehicleDto, VehicleDto>chunk(100, platformTransactionManager)
                 .reader(multiResourceReaderThreadSafe())
                 .processor(this::vehicleProcessor)
-                .writer(items->log.info("Writing items: {}", items))
+                .writer(items -> log.info("Writing items: {}", items))
                 .taskExecutor(taskExecutor())
                 .build();
     }
 
     @Bean
     public Job importVehicleJob(final JobRepository jobRepository, final Step importVehicleStep) {
-        return new JobBuilder("importVehicleJob" , jobRepository)
+        return new JobBuilder("importVehicleJob", jobRepository)
                 .incrementer(new RunIdIncrementer()) //Use it if you want. each the job is executed it increment
                 .start(importVehicleStep)
                 .listener(customJobExecutionListener)
                 .build();
     }
 
-    /**
+
+    */
+/**
      * Virtual Threads in java is design for simplified and scalable concurrent programing within the JVM
-     */
-    public VirtualThreadTaskExecutor taskExecutor(){
+     *//*
+
+
+    public VirtualThreadTaskExecutor taskExecutor() {
         return new VirtualThreadTaskExecutor("Custom-Thread-");
     }
 
@@ -101,3 +119,5 @@ public class ImportVehicleInvoicesJobConfig {
 
 
 }
+
+*/
