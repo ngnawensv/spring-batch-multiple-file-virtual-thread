@@ -34,3 +34,8 @@ input:
     vehicles1: /data/tesla_invoices1.csv
     vehicles2: /data/tesla_invoices2.csv
     vehicles3: /data/tesla_invoices3.csv
+  jsons:
+    vehicles: /data/vehicle-invoices.json
+    vehicles1: /data/vehicle-invoices1.json
+    vehicles2: /data/vehicle-invoices2.json
+    vehicles3: /data/vehicle-invoices3.json

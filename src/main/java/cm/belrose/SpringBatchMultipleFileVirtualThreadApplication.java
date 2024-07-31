@@ -10,7 +10,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  */
 @SpringBootApplication
 @EnableScheduling
-//@EnableConfigurationProperties(InputFilesProperties.class)
+//@EnableConfigurationProperties(InputProperties.class)
 public class SpringBatchMultipleFileVirtualThreadApplication {
 
 	public static void main(String[] args) {
