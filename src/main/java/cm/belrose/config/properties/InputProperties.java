@@ -17,13 +17,20 @@ import java.util.Map;
 @Data
 @RequiredArgsConstructor
 @Slf4j
-public class InputFilesProperties {
+public class InputProperties {
 
-    private Map<String, String> files;
+    private final Map<String, String> files;
+    private final Map<String, String> jsons;
 
-    public Resource[] getResources(){
+    public Resource[] getResources() {
         return getFiles().values().stream()
                 .map(ClassPathResource::new)
                 .toArray(Resource[]::new);
     }
-}
+        public Resource[] getJsonResources () {
+            return getJsons().values().stream()
+                    .map(ClassPathResource::new)
+                    .toArray(Resource[]::new);
+        }
+    }
+

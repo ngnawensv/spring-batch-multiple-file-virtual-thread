@@ -1,7 +1,7 @@
 package cm.belrose.config;
 
-import cm.belrose.config.properties.InputFilesProperties;
-import cm.belrose.dto.VehicleDto;
+import cm.belrose.config.properties.InputProperties;
+import cm.belrose.dto.VehicleForJsonDto;
 import cm.belrose.listener.CustomJobExecutionListener;
 import cm.belrose.reader.MultiResourceReaderThreadSafe;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +14,12 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.file.MultiResourceItemReader;
 import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
-import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.batch.item.file.builder.MultiResourceItemReaderBuilder;
+import org.springframework.batch.item.json.JacksonJsonObjectReader;
+import org.springframework.batch.item.json.JsonItemReader;
+import org.springframework.batch.item.json.builder.JsonItemReaderBuilder;
+import org.springframework.batch.item.support.SynchronizedItemReader;
+import org.springframework.batch.item.support.builder.SynchronizedItemReaderBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.VirtualThreadTaskExecutor;
@@ -24,54 +28,61 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Configuration
 @Slf4j
 @RequiredArgsConstructor
-public class ImportVehicleInvoicesJobConfig {
+public class ImportVehicleInvoicesJsonJobConfig {
 
-    private final InputFilesProperties inputFilesProperties;
+    private final InputProperties inputProperties;
     private final CustomJobExecutionListener customJobExecutionListener;
 
     /**
      * ResourceAwareItemReaderItemStream is an interface, and we can use it instead FlatFileItemReader directly
      * It is a good practice
      */
-    public ResourceAwareItemReaderItemStream<VehicleDto> vehicleDtoFlatFileItemReader() {
-        return new FlatFileItemReaderBuilder<VehicleDto>()
+    @Bean
+    public JsonItemReader<VehicleForJsonDto> jsonItemReader() {
+        return new JsonItemReaderBuilder<VehicleForJsonDto>()
                 .name("Vehicle item reader")
-                .saveState(Boolean.FALSE)
-                .linesToSkip(1) //skip the first line
-                .delimited()
-                .delimiter(",")
-                .names("referenceNumber","model","type","customerFullName")
-                .comments("#") // specify to sky the comment line within the csv file
-                .targetType(VehicleDto.class)
+                .jsonObjectReader(new JacksonJsonObjectReader<>(VehicleForJsonDto.class))
+                .strict(false)
                 .build();
     }
 
     /**
      * This method is used for reading multiple resource
+     * the jsonItemReader is delegate to this method (multiResourceItemReader)
      */
-    public MultiResourceItemReader<VehicleDto> multiResourceItemReader(){
-        return new MultiResourceItemReaderBuilder<VehicleDto>()
+    public MultiResourceItemReader<VehicleForJsonDto> multiResourceItemReader(){
+        return new MultiResourceItemReaderBuilder<VehicleForJsonDto>()
                 .name("Vehicle resources reader")
-                .resources(inputFilesProperties.getResources())
-                .delegate(vehicleDtoFlatFileItemReader())
+                .resources(inputProperties.getJsonResources())
+                .delegate(jsonItemReader())
                 .build();
     }
 
     /**
-     *this method is for concurrency issue
+     *this method is the custom multi thread safe.
      */
-    public MultiResourceReaderThreadSafe<VehicleDto> multiResourceReaderThreadSafe(){
+    /*public MultiResourceReaderThreadSafe<VehicleForJsonDto> multiResourceReaderThreadSafe(){
         var multiResourceReader = new MultiResourceReaderThreadSafe<>(multiResourceItemReader());
-        multiResourceReader.setResources(inputFilesProperties.getResources());
+        multiResourceReader.setResources(inputProperties.getJsonResources());
         return multiResourceReader;
+    }*/
+
+    /**
+     *When using multiResource, we have to delegate multiResourceItemReader to this
+     * synchronizedItemReader methode
+     */
+    public SynchronizedItemReader<VehicleForJsonDto> synchronizedItemReader(){
+        return new SynchronizedItemReaderBuilder<VehicleForJsonDto>()
+                .delegate(multiResourceItemReader())
+                .build();
     }
 
 
     @Bean
     public Step importVehicleStep(final JobRepository jobRepository, final PlatformTransactionManager platformTransactionManager) {
         return new StepBuilder("importVehicleStep", jobRepository)
-                .<VehicleDto, VehicleDto>chunk(100, platformTransactionManager)
-                .reader(multiResourceReaderThreadSafe())
+                .<VehicleForJsonDto, VehicleForJsonDto>chunk(100, platformTransactionManager)
+                .reader(synchronizedItemReader())
                 .processor(this::vehicleProcessor)
                 .writer(items->log.info("Writing items: {}", items))
                 .taskExecutor(taskExecutor())
@@ -91,10 +102,10 @@ public class ImportVehicleInvoicesJobConfig {
      * Virtual Threads in java is design for simplified and scalable concurrent programing within the JVM
      */
     public VirtualThreadTaskExecutor taskExecutor(){
-        return new VirtualThreadTaskExecutor("Custom-Thread-");
+        return new VirtualThreadTaskExecutor("Json-Thread-");
     }
 
-    private VehicleDto vehicleProcessor(VehicleDto item) {
+    private VehicleForJsonDto vehicleProcessor(VehicleForJsonDto item) {
         log.info("Processing the item: {}", item);
         return item;
     }
