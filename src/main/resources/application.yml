@@ -30,7 +30,7 @@ spring:
 #This is the dynamic list. You can add another key, value.
 input:
   files:
-    vehicles: data/tesla_invoices.csv
+    vehicles: /data/tesla_invoices.csv
     vehicles1: /data/tesla_invoices1.csv
     vehicles2: /data/tesla_invoices2.csv
     vehicles3: /data/tesla_invoices3.csv
