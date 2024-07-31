@@ -27,6 +27,10 @@ spring:
       jdbc:
         initialize-schema: always # related to initialize schema
 
+    #This configuration avoid using the starter-web tomcat
+    main:
+      web-application-type: none
+
 #This is the dynamic list. You can add another key, value.
 input:
   files:
@@ -39,3 +43,14 @@ input:
     vehicles1: /data/vehicle-invoices1.json
     vehicles2: /data/vehicle-invoices2.json
     vehicles3: /data/vehicle-invoices3.json
+  pdfs:
+    invoices: /data/resource/invoices.pdf
+    invoices1: /data/resource/invoices1.pdf
+    invoices2: /data/resource/invoices2.pdf
+    invoices3: /data/resource/invoices3.pdf
+    img1: /data/resource/img1.png
+    img2: /data/resource/img2.png
+    img3: /data/resource/img3.png
+    img4: /data/resource/img4.png
+  all: /data/resource/*.*
+

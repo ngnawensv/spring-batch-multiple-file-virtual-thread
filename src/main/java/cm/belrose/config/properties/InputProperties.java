@@ -7,6 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
+
 import java.util.Map;
 
 /**
@@ -21,16 +22,24 @@ public class InputProperties {
 
     private final Map<String, String> files;
     private final Map<String, String> jsons;
+    private final Map<String, String> pdfs;
 
     public Resource[] getResources() {
         return getFiles().values().stream()
                 .map(ClassPathResource::new)
                 .toArray(Resource[]::new);
     }
-        public Resource[] getJsonResources () {
-            return getJsons().values().stream()
-                    .map(ClassPathResource::new)
-                    .toArray(Resource[]::new);
-        }
+
+    public Resource[] getJsonResources() {
+        return getJsons().values().stream()
+                .map(ClassPathResource::new)
+                .toArray(Resource[]::new);
     }
+
+    public Resource[] getPdfResources() {
+        return getPdfs().values().stream()
+                .map(ClassPathResource::new)
+                .toArray(Resource[]::new);
+    }
+}
 
