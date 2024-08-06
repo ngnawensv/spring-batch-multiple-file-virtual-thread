@@ -51,10 +51,10 @@ spring:
   #  3-Under "Signing in to Google", select "App passwords".
   #  4-Generate a new app password for your email application and use that password in your configuration.
     mail:
-      host:  smtp.gmail.com
-      port: 587
-      username: ngnawens@gmail.com #Sender email
-      password: qsvx gtew rdfn uvkl # sender password
+      host: MAIL_HOST
+      port: MAIL_PORT
+      username: MAIL_USERNAME #Sender email
+      password:  MAIL_PASSWORD # sender password
       protocol: smtp
       properties:
         mail:
