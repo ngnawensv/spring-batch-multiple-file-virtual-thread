@@ -1,6 +1,7 @@
 package cm.belrose.client;
 
 import cm.belrose.client.dto.FileToUpload;
+import cm.belrose.client.dto.FileToUploadResponse;
 import cm.belrose.dto.UploadFileDto;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
@@ -14,12 +15,12 @@ public class DigitalStorageClient {
     private final RestClient restClient = RestClient.create();
 
     @SneakyThrows
-    public  String upload(UploadFileDto uploadFileDto){
+    public  FileToUploadResponse upload(UploadFileDto uploadFileDto){
         var fileToUpload = new FileToUpload(uploadFileDto.fileName(), Files.readAllBytes(uploadFileDto.file().toPath()));
         return restClient.post()
                 .uri("http://localhost:8080/storage")
                 .body(fileToUpload)
                 .retrieve()
-                .body(String.class);
+                .body(FileToUploadResponse.class);
     }
 }
