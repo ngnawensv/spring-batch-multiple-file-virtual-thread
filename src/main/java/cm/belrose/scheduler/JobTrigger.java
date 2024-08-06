@@ -18,7 +18,7 @@ import java.util.Date;
 public class JobTrigger {
 
     private final JobLauncher jobLauncher;
-    private  final Job job;
+    private final Job job;
 
     @Scheduled(cron = "0/30 * * ? * *")
     @SneakyThrows
