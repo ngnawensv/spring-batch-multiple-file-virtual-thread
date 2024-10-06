@@ -5,7 +5,7 @@ spring:
     datasource:
       driver-class-name: com.mysql.cj.jdbc.Driver
       username: root
-      password: root
+      password: admin
       url: jdbc:mysql://localhost:3306/vehicle_db?createDatabaseIfNotExist=true
 
     jpa:
@@ -51,10 +51,10 @@ spring:
   #  3-Under "Signing in to Google", select "App passwords".
   #  4-Generate a new app password for your email application and use that password in your configuration.
     mail:
-      host: MAIL_HOST
-      port: MAIL_PORT
-      username: MAIL_USERNAME #Sender email
-      password:  MAIL_PASSWORD # sender password
+      host: smtp.gmail.com
+      port: 587
+      username: ngnawens@gmail.com #Sender email
+      password:  bqid vfqr rmkr ewpe # sender password
       protocol: smtp
       properties:
         mail:
@@ -67,15 +67,15 @@ spring:
 #This is the dynamic list. You can add another key, value.
 input:
   files:
-    vehicles: /data/tesla_invoices.csv
-    vehicles1: /data/tesla_invoices1.csv
-    vehicles2: /data/tesla_invoices2.csv
-    vehicles3: /data/tesla_invoices3.csv
+    vehicles: /data/csv/tesla_invoices.csv
+    vehicles1: /data/csv/tesla_invoices1.csv
+    vehicles2: /data/csv/tesla_invoices2.csv
+    vehicles3: /data/csv/tesla_invoices3.csv
   jsons:
-    vehicles: /data/vehicle-invoices.json
-    vehicles1: /data/vehicle-invoices1.json
-    vehicles2: /data/vehicle-invoices2.json
-    vehicles3: /data/vehicle-invoices3.json
+    vehicles: /data/json/vehicle-invoices.json
+    vehicles1: /data/json/vehicle-invoices1.json
+    vehicles2: /data/json/vehicle-invoices2.json
+    vehicles3: /data/json/vehicle-invoices3.json
   pdfs:
     invoices: /data/resource/invoices.pdf
     invoices1: /data/resource/invoices1.pdf
@@ -85,6 +85,6 @@ input:
     img2: /data/resource/img2.png
     img3: /data/resource/img3.png
     img4: /data/resource/img4.png
-  all: /data/resource/*.*
+  all: /data/resources/*.*
 
 

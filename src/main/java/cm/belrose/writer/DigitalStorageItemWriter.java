@@ -26,7 +26,7 @@ public class DigitalStorageItemWriter implements ItemWriter<UploadFileDto> {
      private StepExecution stepExecution;
 
     @Override
-    public void write(@Nonnull Chunk<? extends UploadFileDto> chunk) throws Exception {
+    public void write(@Nonnull Chunk<? extends UploadFileDto> chunk){
         log.info("Writing items: {}", chunk);
         chunk.forEach(this::process);
     }
@@ -34,6 +34,7 @@ public class DigitalStorageItemWriter implements ItemWriter<UploadFileDto> {
     private void process(UploadFileDto item) {
        List<String> filesUploadedCodes = (List<String>) stepExecution.getExecutionContext().get("filesUploadedCodes");
         FileToUploadResponse filesUploadedResponse = upload(item);
+        assert filesUploadedCodes != null;
         filesUploadedCodes.add(filesUploadedResponse.getCode());
     }
 

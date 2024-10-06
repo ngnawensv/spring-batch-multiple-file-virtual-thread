@@ -1,8 +1,6 @@
 package cm.belrose.config;
 
-import cm.belrose.client.DigitalStorageClient;
 import cm.belrose.processor.InvoiceResourceItemProcessor;
-import cm.belrose.config.properties.InputProperties;
 import cm.belrose.dto.UploadFileDto;
 import cm.belrose.dto.VehicleForJsonDto;
 import cm.belrose.listener.CustomJobExecutionListener;
@@ -21,7 +19,6 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.Tasklet;
-import org.springframework.batch.item.adapter.ItemWriterAdapter;
 import org.springframework.batch.item.file.MultiResourceItemReader;
 import org.springframework.batch.item.file.ResourcesItemReader;
 import org.springframework.batch.item.file.builder.MultiResourceItemReaderBuilder;
@@ -29,6 +26,7 @@ import org.springframework.batch.item.json.JacksonJsonObjectReader;
 import org.springframework.batch.item.json.JsonItemReader;
 import org.springframework.batch.item.json.builder.JsonItemReaderBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -56,7 +54,7 @@ public class ImportVehicleInvoicesResourceJobConfig {
      * ResourceAwareItemReaderItemStream is an interface, and we can use it instead FlatFileItemReader directly
      * It is a good practice
      */
-    @Bean
+   // @Bean
     public JsonItemReader<VehicleForJsonDto> jsonItemReader() {
         return new JsonItemReaderBuilder<VehicleForJsonDto>()
                 .name("Vehicle item reader")
@@ -88,6 +86,7 @@ public class ImportVehicleInvoicesResourceJobConfig {
     }
 
     @Bean
+    @Qualifier("importInvoicesStep")
     public Step importVehicleStep(final JobRepository jobRepository, final PlatformTransactionManager platformTransactionManager) {
         return new StepBuilder("import Invoices Step", jobRepository)
                 .<Resource, UploadFileDto>chunk(2, platformTransactionManager)
@@ -104,6 +103,7 @@ public class ImportVehicleInvoicesResourceJobConfig {
      * In this step we use tasklet
      */
     @Bean
+    @Qualifier("mailSenderStep")
     public Step mailSenderStep(final JobRepository jobRepository, final PlatformTransactionManager platformTransactionManager) {
         return new StepBuilder("mail send Step", jobRepository)
                 .tasklet(new Tasklet() {
@@ -123,11 +123,12 @@ public class ImportVehicleInvoicesResourceJobConfig {
     }
 
     @Bean
-    public Job importVehicleJob(final JobRepository jobRepository, final Step importVehicleStep, final Step mailSenderStep) {
-        return new JobBuilder("import Invoices Job" , jobRepository)
+    @Qualifier("importVehicleInvoicesJob")
+    public Job importVehicleInvoicesJob(final JobRepository jobRepository, final PlatformTransactionManager platformTransactionManager) {
+        return new JobBuilder("importVehicleInvoicesJob" , jobRepository)
                 .incrementer(new RunIdIncrementer()) //Use it if you want. each the job is executed it increment
-                .start(importVehicleStep)
-                .next(mailSenderStep)
+                .start(importVehicleStep(jobRepository,platformTransactionManager))
+                .next(mailSenderStep(jobRepository,platformTransactionManager))
                 .listener(customJobExecutionListener)
                 .build();
     }

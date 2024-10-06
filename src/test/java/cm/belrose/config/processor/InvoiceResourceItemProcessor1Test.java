@@ -18,7 +18,7 @@ class InvoiceResourceItemProcessor1Test {
     @SneakyThrows
     void shouldProcess(){
         //given this resource
-        Path path = Path.of("/data/resource/invoices.pdf");
+        Path path = Path.of("/data/resources/invoices.pdf");
         PathResource resource = new PathResource(path);
 
         //when process

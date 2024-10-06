@@ -31,7 +31,7 @@ public class EmailServiceImpl implements EmailService {
         String emailBody = content.fileCodes()
                 .stream()
                 .map(str -> baseUrl.concat(str).concat("\n"))
-                .collect(Collectors.joining("\n"));
+                .collect(Collectors.joining());
 
         /*var simpleMailMessage = new SimpleMailMessage();
        // simpleMailMessage.setFrom("ngnawens@gmail.com");
